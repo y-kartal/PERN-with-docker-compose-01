@@ -20,6 +20,13 @@ pipeline {
                 sh 'docker image ls'
             }
         }
+         stage('Docker Login') {
+            steps {
+                script {
+                    docker.withRegistry('https://yasinkartal.hub.docker.com', '909218*ykv') {
+                        // Login to Docker Hub
+                    }
+                }
         stage('Push Image Docker Hub') {
             steps {
                 echo 'Push Image Docker Hub'
