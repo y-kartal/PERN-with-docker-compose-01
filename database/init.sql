@@ -1,4 +1,4 @@
-CREATE DATABASE cloudnice;
+CREATE DATABASE clarustodo;
 
 \c cloudnice;
 
