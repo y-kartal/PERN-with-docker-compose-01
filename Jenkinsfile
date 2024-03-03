@@ -88,8 +88,7 @@ pipeline {
                 timeout(time:5, unit:'DAYS') {
                     input message:'Approve terminate'
                 }
-                sh 'sh 'docker rmi -f $DOCKERHUB_USER/$APP_REPO_NAME:postgre $DOCKERHUB_USER/$APP_REPO_NAME:nodejs $DOCKERHUB_USER/$APP_REPO_NAME:react'
-'
+                sh 'docker rmi -f yasinkartal/todo-app:postgre yasinkartal/todo-app:nodejs yasinkartal/todo-app:react'
             }
         }
     }
