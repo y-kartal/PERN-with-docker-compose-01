@@ -7,7 +7,7 @@ pipeline {
         DB_VOLUME="myvolume12"
         NETWORK="my_network"   
         POSTGRES_PASSWORD= "Pp123456789" 
-        DOCKER_IMAGE="$DOCKERHUB_USER/$APP_REPO_NAME:postgre $DOCKERHUB_USER/$APP_REPO_NAME:nodejs $DOCKERHUB_USER/$APP_REPO_NAME:react"   
+        DOCKER_IMAGE="yasinkartal/todo-app"   
     }
 
     stages {
@@ -51,7 +51,7 @@ pipeline {
             steps {
                 script {
                     echo 'Waiting for the postgre database docker container'
-                    sh 'sleep 120s'
+                    sh 'sleep 60s'
                 }
             }
         }
@@ -65,7 +65,7 @@ pipeline {
             steps {
                 script {
                     echo 'Waiting for the server container'
-                    sh 'sleep 60s'
+                    sh 'sleep 30s'
                 }
             }
         }
@@ -83,12 +83,15 @@ pipeline {
                 sh 'docker rm -f $(docker ps -aq)' 
             }
         }
-        stage('Docker image Delete') {
+        stage('DELETE image, volume, network') {
             steps {
                 timeout(time:5, unit:'DAYS') {
                     input message:'Approve terminate'
                 }
-                sh 'docker rmi -f yasinkartal/todo-app:postgre yasinkartal/todo-app:nodejs yasinkartal/todo-app:react'
+                sh 'docker rmi -f $DOCKER_IMAGE:postgre $DOCKER_IMAGE:nodejs $DOCKER_IMAGE:react'
+                sh 'docker network rm $NETWORK'
+                sh 'docker volume rm $DB_VOLUME'
+
             }
         }
     }
