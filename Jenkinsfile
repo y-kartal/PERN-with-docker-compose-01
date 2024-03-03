@@ -99,7 +99,7 @@ pipeline {
     post {
         success {
             script {
-                slackSend channel: '#class-chat', color: '#439FE0', message: ' Project-207 with Jenkins, Docker, Docker Compose, and Docker Hub ', teamDomain: 'devops15tr', tokenCredentialId: '207'
+                slackSend channel: '#class-chat', color: '#439FE0', message: ' :100: :100:  ', teamDomain: 'devops15tr', tokenCredentialId: '207'
             }
         }
     }

@@ -1,6 +1,6 @@
 CREATE DATABASE clarustodo;
 
-\c cloudnice;
+\c clarustodo;
 
 CREATE TABLE todo(
     todo_id SERIAL PRIMARY KEY,
