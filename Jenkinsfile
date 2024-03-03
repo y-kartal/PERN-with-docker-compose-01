@@ -88,7 +88,8 @@ pipeline {
                 timeout(time:5, unit:'DAYS') {
                     input message:'Approve terminate'
                 }
-                sh 'docker rmi -f $IMAGE_ID'
+                sh 'sh 'docker rmi -f $DOCKERHUB_USER/$APP_REPO_NAME:postgre $DOCKERHUB_USER/$APP_REPO_NAME:nodejs $DOCKERHUB_USER/$APP_REPO_NAME:react'
+'
             }
         }
     }

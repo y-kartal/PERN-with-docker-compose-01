@@ -1,7 +1,7 @@
 FROM node:14.21-slim
 WORKDIR /app
-COPY package*.json ./
+COPY ./client/package*.json ./
 RUN yarn install
-COPY . .
+COPY ./client/ .
 EXPOSE 3000
 CMD ["yarn", "run", "start"]
