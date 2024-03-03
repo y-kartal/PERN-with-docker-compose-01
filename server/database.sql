@@ -1,4 +1,4 @@
-CREATE DATABASE perntodo;
+CREATE DATABASE clarustodo;
 
 CREATE TABLE todo(
     todo_id SERIAL PRIMARY KEY, 
