@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKERHUB_USER="yasinkartal"
         APP_REPO_NAME = "todo-app"      
-        DB_VOLUME="myvolume12"
+        DB_VOLUME="myvolume123"
         NETWORK="my_network"   
         POSTGRES_PASSWORD= "Pp123456789" 
         DOCKER_IMAGE="$DOCKERHUB_USER/$APP_REPO_NAME:postgre $DOCKERHUB_USER/$APP_REPO_NAME:nodejs $DOCKERHUB_USER/$APP_REPO_NAME:react"   
