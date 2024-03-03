@@ -20,16 +20,10 @@ pipeline {
                 sh 'docker image ls'
             }
         }
-         stage('Docker Login') {
-            steps {
-                script {
-                    docker.withRegistry('https://yasinkartal.hub.docker.com', '909218*ykv') {
-                        // Login to Docker Hub
-                    }
-                }
-        stage('Push Image Docker Hub') {
+    stage('Push Image Docker Hub') {
             steps {
                 echo 'Push Image Docker Hub'
+                sh 'docker login -u yasinkartal -p dckr_pat_QCOcHihdVP0NylqtKQ_5pAkGqLM'
                 sh 'docker push "$DOCKERHUB_USER/$APP_REPO_NAME:postgre"'
                 sh 'docker push "$DOCKERHUB_USER/$APP_REPO_NAME:nodejs"'
                 sh 'docker push "$DOCKERHUB_USER/$APP_REPO_NAME:react"'
