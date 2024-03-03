@@ -43,7 +43,7 @@ pipeline {
         stage('Deploy the postgre') {
             steps {
                 echo 'Deploy the postgre database'
-                sh 'docker run --name db -p 5432:5432 -v $DB_VOLUME:/var/lib/postgresql/data --network $NETWORK -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD --restart always -d $DOCKERHUB_USER/$APP_REPO_NAME:postgre  ' 
+                sh 'docker run --name db -p 5432:5432 -v $DB_VOLUME:/var/lib/postgresql/data --network $NETWORK -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD --restart always -d $DOCKERHUB_USER/$APP_REPO_NAME:postgre' 
             }
         }
         stage('wait the postgre database') {
@@ -54,7 +54,6 @@ pipeline {
                 }
             }
         }
-
         stage('Deploy the node_js_server') {
             steps {
                 echo 'Deploy the server'
@@ -69,13 +68,12 @@ pipeline {
                 }
             }
         }
-         stage('Deploy the client') {
+        stage('Deploy the client') {
             steps {
                 echo 'Deploy the client'
-                sh 'docker run --name server -p 3000:3000  --network $NETWORK --restart always -d $DOCKERHUB_USER/$APP_REPO_NAME:react' 
+                sh 'docker run --name client -p 3000:3000  --network $NETWORK --restart always -d $DOCKERHUB_USER/$APP_REPO_NAME:react' 
             }
         }
-
         stage('Docker Container Stop') {
             steps {
                 timeout(time:5, unit:'DAYS') {
@@ -84,8 +82,7 @@ pipeline {
                 sh 'docker rm -f $(docker ps -aq)' 
             }
         }
-    }
-    stage('Docker image Delete') {
+        stage('Docker image Delete') {
             steps {
                 timeout(time:5, unit:'DAYS') {
                     input message:'Approve terminate'
@@ -97,10 +94,9 @@ pipeline {
 
     post {
         success {
-        script {
-        slackSend channel: '#class-chat', color: '#439FE0', message: ' Project-207 with Jenkins, Docker, Docker Compose, and Docker Hub ', teamDomain: 'devops15tr', tokenCredentialId: '207'
+            script {
+                slackSend channel: '#class-chat', color: '#439FE0', message: ' Project-207 with Jenkins, Docker, Docker Compose, and Docker Hub ', teamDomain: 'devops15tr', tokenCredentialId: '207'
             }
+        }
     }
-    }  
-
-
+}
