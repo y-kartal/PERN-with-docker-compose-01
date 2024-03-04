@@ -90,7 +90,6 @@ pipeline {
                 echo 'All the resources will be cleaned up in the next step...'
                 script {
                     sh 'docker container ls && docker images && docker network ls && docker volume ls'
-                    sh 'docker rm -f $(docker container ls -aq)'
                 } 
             }
         }
