@@ -1,0 +1,39 @@
+version: '3'
+services:
+  db:
+    build:
+      context: ./database/ 
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: "Pp123456789"
+    networks:
+      - mynet
+
+  server:
+    build:
+      context: ./server/
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    restart: always
+    ports:
+      - "5000:5000"
+    networks:
+      - mynet
+
+  client:
+    build:
+      context: ./client/
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - server
+    restart: always
+    networks:
+      - mynet
+
+networks:
+  mynet:
+    driver: bridge
