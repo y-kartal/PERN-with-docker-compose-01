@@ -8,7 +8,6 @@ pipeline {
         NETWORK = "my_network"   
         DOCKER_IMAGE = "yasinkartal/todo-app"   
     }
-
     stages {
         stage('Build App Docker Image') {
             steps {
@@ -31,14 +30,12 @@ pipeline {
                 }
             }
         }
-
         stage('create volume') {
             steps {
                 echo 'create the volume for app and container'
                 sh "docker volume create $DB_VOLUME"
             }
         }
-
         stage('create network') {
             steps {
                 echo 'creating the network for app and all containers'
@@ -53,7 +50,7 @@ pipeline {
                     sh "docker run --name db -p 5432:5432 -v $DB_VOLUME:/var/lib/postgresql/data --network $NETWORK -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD --restart always -d $DOCKERHUB_USER/$APP_REPO_NAME:postgre" 
                 }
             }
-        }
+        }}
 
         stage('wait the postgre database') {
             steps {
@@ -86,27 +83,38 @@ pipeline {
                 sh "docker run --name client -p 3000:3000 --network $NETWORK --restart always -d $DOCKERHUB_USER/$APP_REPO_NAME:react" 
             }
         }
-    }
+    
 
+         stage('Destroy the infrastructure') {
+            steps {
+                timeout(time:5, unit:'DAYS') {
+                    input message:'Approve terminate'
+                }
+                echo 'All the resources will be cleaned up in the next step...'
+                script {
+                sh 'docker container ls && docker images && docker network ls && docker volume ls'
+                sh 'docker rm -f $(docker container ls -aq)'
+                } 
+            }
+        }
+        
     post {
         always {
             echo 'Cleaning up'
             script {
-                sh 'docker rm -f $(docker container ls -aq)'
-                sh "docker rmi -f $DOCKER_IMAGE:postgre $DOCKER_IMAGE:nodejs $DOCKER_IMAGE:react"
-                sh "docker network rm $NETWORK"
-                sh "docker volume rm $DB_VOLUME"
+                sh 'docker rmi -f $(docker images -q)'
+                sh 'docker network rm $NETWORK'
+                sh 'docker volume rm $DB_VOLUME'
             }
         }
 
         success {
             echo 'Pipeline executed successfully'
-            sh 'echo "SUCCES"'
+            sh 'echo  "SUCCESS" '
         }
 
         failure {
             echo 'Pipeline failed. Cleaning up containers, images, network, and volume.'
-            sh 'echo "FAİLURE"'
+             sh 'echo  "FAILURE" '
         }
     }
-}
