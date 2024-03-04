@@ -2,106 +2,92 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_USER = "yasinkartal"
-        APP_REPO_NAME = "todo-app"      
-        DB_VOLUME = "myvolume1234"
-        NETWORK = "my_network"   
-        DOCKER_IMAGE = "yasinkartal/todo-app"   
+        DOCKERHUB_USER="yasindevops06"
+        APP_REPO_NAME="todo-app"
+        DB_VOLUME="myvolume"
+        NETWORK="mynetwork"
     }
+
     stages {
         stage('Build App Docker Image') {
             steps {
                 echo 'Building App Image'
-                sh "docker build --force-rm -t $DOCKERHUB_USER/$APP_REPO_NAME:postgre -f ./database/Dockerfile ."
-                sh "docker build --force-rm -t $DOCKERHUB_USER/$APP_REPO_NAME:nodejs -f ./server/Dockerfile ."
-                sh "docker build --force-rm -t $DOCKERHUB_USER/$APP_REPO_NAME:react -f ./client/Dockerfile ."
-                sh "docker image ls"
+                sh 'docker build --force-rm -t "$DOCKERHUB_USER/$APP_REPO_NAME:postgre" -f ./database/Dockerfile .'
+                sh 'docker build --force-rm -t "$DOCKERHUB_USER/$APP_REPO_NAME:nodejs" -f ./server/Dockerfile .'
+                sh 'docker build --force-rm -t "$DOCKERHUB_USER/$APP_REPO_NAME:react" -f ./client/Dockerfile .'
+                sh 'docker image ls'
             }
         }
 
-        stage('Push Image Docker Hub') {
+        stage('Push Image to Dockerhub Repo') {
             steps {
-                echo 'Push Image Docker Hub'
-                withCredentials([string(credentialsId: 'My_Docker_Hub_Token', variable: 'DOCKER_HUB')]) {
-                    sh "docker login -u $DOCKERHUB_USER -p $DOCKER_HUB"
-                    sh "docker push $DOCKERHUB_USER/$APP_REPO_NAME:postgre"
-                    sh "docker push $DOCKERHUB_USER/$APP_REPO_NAME:nodejs"
-                    sh "docker push $DOCKERHUB_USER/$APP_REPO_NAME:react"
+                echo 'Pushing App Image to DockerHub Repo'
+                withCredentials([string(credentialsId: 'my-dockerhub-token', variable: 'DOCKERHUB_TOKEN')]) {
+                    sh 'docker login -u yasindevops06 -p $DOCKERHUB_TOKEN'
+                    sh 'docker push "$DOCKERHUB_USER/$APP_REPO_NAME:postgre"'
+                    sh 'docker push "$DOCKERHUB_USER/$APP_REPO_NAME:nodejs"'
+                    sh 'docker push "$DOCKERHUB_USER/$APP_REPO_NAME:react"'
                 }
             }
         }
-        stage('create volume') {
+        
+        stage('Create Volume') {
             steps {
-                echo 'create the volume for app and container'
-                sh "docker volume create $DB_VOLUME"
-            }
-        }
-        stage('create network') {
-            steps {
-                echo 'creating the network for app and all containers'
-                sh "docker network create $NETWORK"
+                echo 'Creating the volume for app and db containers.'
+                sh 'docker volume create $DB_VOLUME'
             }
         }
 
-        stage('Deploy the postgre') {
+        stage('Create Network') {
             steps {
-                withCredentials([string(credentialsId: 'project-207-postgre-password', variable: 'POSTGRES_PASSWORD')]) {
-                    echo 'Deploy the postgre database'
-                    sh "docker run --name db -p 5432:5432 -v $DB_VOLUME:/var/lib/postgresql/data --network $NETWORK -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD --restart always -d $DOCKERHUB_USER/$APP_REPO_NAME:postgre" 
-                }
+                echo 'Creating the network for app and db containers.'
+                sh 'docker network create $NETWORK'
             }
-        }}
+        }
 
-        stage('wait the postgre database') {
+        stage('Deploy the DB') {
             steps {
-                script {
-                    echo 'Waiting for the postgre database docker container'
-                    sh 'sleep 60s'
+                echo 'Deploying the DB'
+                withCredentials([string(credentialsId: 'project901-postgre-password', variable: 'POSTGRES_PASSWORD')]) {
+                    sh 'docker run --name db -p 5432:5432 -v $DB_VOLUME:/var/lib/postgresql/data --network $NETWORK -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD --restart always -d $DOCKERHUB_USER/$APP_REPO_NAME:postgre'
                 }
             }
         }
 
-        stage('Deploy the node_js_server') {
+        stage('Wait for the DB') {
             steps {
-                echo 'Deploy the server'
-                sh "docker run --name server -p 5000:5000 --network $NETWORK --restart always -d $DOCKERHUB_USER/$APP_REPO_NAME:nodejs" 
+                echo 'Waiting for the DB container'
+                sh 'docker container wait db'
             }
         }
 
-        stage('wait the server') {
+        stage('Deploy the server') {
             steps {
-                script {
-                    echo 'Waiting for the server container'
-                    sh 'sleep 30s'
-                }
+                echo 'Deploying the server'
+                sh 'docker run --name server -p 5000:5000 --network $NETWORK --restart always -d $DOCKERHUB_USER/$APP_REPO_NAME:nodejs'
+            }
+        }
+
+        stage('Wait for the server') {
+            steps {
+                echo 'Waiting for the server container'
+                sh 'docker container wait server'
             }
         }
 
         stage('Deploy the client') {
             steps {
-                echo 'Deploy the client'
-                sh "docker run --name client -p 3000:3000 --network $NETWORK --restart always -d $DOCKERHUB_USER/$APP_REPO_NAME:react" 
+                echo 'Deploying the client'
+                sh 'docker run --name client -p 3000:3000 --network $NETWORK --restart always -d $DOCKERHUB_USER/$APP_REPO_NAME:react'
             }
         }
-    
+    }
 
-         stage('Destroy the infrastructure') {
-            steps {
-                timeout(time:5, unit:'DAYS') {
-                    input message:'Approve terminate'
-                }
-                echo 'All the resources will be cleaned up in the next step...'
-                script {
-                sh 'docker container ls && docker images && docker network ls && docker volume ls'
-                sh 'docker rm -f $(docker container ls -aq)'
-                } 
-            }
-        }
-        
     post {
         always {
             echo 'Cleaning up'
             script {
+                sh 'docker rm -f $(docker container ls -aq)'
                 sh 'docker rmi -f $(docker images -q)'
                 sh 'docker network rm $NETWORK'
                 sh 'docker volume rm $DB_VOLUME'
@@ -110,11 +96,12 @@ pipeline {
 
         success {
             echo 'Pipeline executed successfully'
-            sh 'echo  "SUCCESS" '
+            sh 'echo "SUCCESS"'
         }
 
         failure {
             echo 'Pipeline failed. Cleaning up containers, images, network, and volume.'
-             sh 'echo  "FAILURE" '
+            sh 'echo "FAILURE"'
         }
     }
+}
