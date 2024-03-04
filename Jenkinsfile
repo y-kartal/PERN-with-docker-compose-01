@@ -83,6 +83,20 @@ pipeline {
         }
     }
 
+       stage('Destroy the infrastructure') {
+            steps {
+                timeout(time:5, unit:'DAYS') {
+                    input message:'Approve terminate'
+                }
+                echo 'All the resources will be cleaned up in the next step...'
+                script {
+                sh 'docker container ls && docker images && docker network ls && docker volume ls'
+                sh 'docker rm -f $(docker container ls -aq)'
+                } 
+            }
+        }
+    }
+
     post {
         always {
             echo 'Cleaning up'
@@ -96,12 +110,11 @@ pipeline {
 
         success {
             echo 'Pipeline executed successfully'
-            sh 'echo "SUCCESS"'
+            sh 'echo  "SUCCESS" '
         }
 
         failure {
             echo 'Pipeline failed. Cleaning up containers, images, network, and volume.'
-            sh 'echo "FAILURE"'
+             sh 'echo  "FAILURE" '
         }
     }
-}
