@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKERHUB_USER = "yasinkartal"
         APP_REPO_NAME = "todo-app"      
-        DB_VOLUME = "myvolume123"
+        DB_VOLUME = "myvolume1234"
         NETWORK = "my_network"   
         DOCKER_IMAGE = "yasinkartal/todo-app"   
     }
