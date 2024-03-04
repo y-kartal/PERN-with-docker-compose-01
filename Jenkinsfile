@@ -46,7 +46,7 @@ pipeline {
             steps {
                 withCredentials([string(credentialsId: 'POSTGRES_PASSWORD', variable: 'POSTGRES_PASSWORD')])
                 echo 'Deploy the postgre database'
-                sh 'docker run --name db -p 5432:5432 -v $DB_VOLUME:/var/lib/postgresql/data --network $NETWORK -e POSTGRES_PASSWORD=POSTGRES_PASSWORD --restart always -d $DOCKERHUB_USER/$APP_REPO_NAME:postgre' 
+                sh 'docker run --name db -p 5432:5432 -v $DB_VOLUME:/var/lib/postgresql/data --network $NETWORK -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD --restart always -d $DOCKERHUB_USER/$APP_REPO_NAME:postgre' 
             }
         }
         stage('wait the postgre database') {
