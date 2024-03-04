@@ -36,14 +36,14 @@ pipeline {
             steps {
                 echo 'create the volume for app and container'
                 sh "docker volume create $DB_VOLUME"
-             }
+            }
         }
 
         stage('create network') {
             steps {
                 echo 'creating the network for app and all containers'
                 sh "docker network create $NETWORK"
-             }
+            }
         }
 
         stage('Deploy the postgre') {
@@ -84,6 +84,18 @@ pipeline {
             steps {
                 echo 'Deploy the client'
                 sh "docker run --name client -p 3000:3000 --network $NETWORK --restart always -d $DOCKERHUB_USER/$APP_REPO_NAME:react" 
+            }
+        }
+
+        stage('Destroy the infrastructure') {
+            steps {
+                timeout(time: 5, unit: 'DAYS') {
+                    input message: 'Approve terminate'
+                }
+                // sh 'docker rm -f $(docker container ls -aq)'
+                // sh 'docker network rm $NETWORK'
+                // sh 'docker volume rm $DB_VOLUME'
+                sh 'docker container ls && docker images && docker network ls && docker volume ls'
             }
         }
     }
