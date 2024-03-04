@@ -86,25 +86,9 @@ pipeline {
                 sh "docker run --name client -p 3000:3000 --network $NETWORK --restart always -d $DOCKERHUB_USER/$APP_REPO_NAME:react" 
             }
         }
-
-    //     stage('Destroy the infrastructure') {
-    //         steps {
-    //             timeout(time: 5, unit: 'DAYS') {
-    //                 input message: 'Approve terminate'
-    //             }
-    //             // sh 'docker rm -f $(docker container ls -aq)'
-    //             // sh 'docker network rm $NETWORK'
-    //             // sh 'docker volume rm $DB_VOLUME'
-    //             sh 'docker container ls && docker images && docker network ls && docker volume ls'
-    //         }
-    //     }
-    // }
+    }
 
     post {
-        steps {
-                timeout(time: 5, unit: 'DAYS') {
-                    input message: 'Approve terminate'
-                }
         always {
             echo 'Cleaning up'
             script {
