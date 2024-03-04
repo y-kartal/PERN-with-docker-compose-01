@@ -81,17 +81,16 @@ pipeline {
                 sh 'docker run --name client -p 3000:3000 --network $NETWORK --restart always -d $DOCKERHUB_USER/$APP_REPO_NAME:react'
             }
         }
-    }
 
-       stage('Destroy the infrastructure') {
+        stage('Destroy the infrastructure') {
             steps {
                 timeout(time:5, unit:'DAYS') {
                     input message:'Approve terminate'
                 }
                 echo 'All the resources will be cleaned up in the next step...'
                 script {
-                sh 'docker container ls && docker images && docker network ls && docker volume ls'
-                sh 'docker rm -f $(docker container ls -aq)'
+                    sh 'docker container ls && docker images && docker network ls && docker volume ls'
+                    sh 'docker rm -f $(docker container ls -aq)'
                 } 
             }
         }
@@ -118,3 +117,4 @@ pipeline {
              sh 'echo  "FAILURE" '
         }
     }
+}
