@@ -57,7 +57,7 @@ pipeline {
         stage('Wait for the DB') {
             steps {
                 echo 'Waiting for the DB container'
-                sh 'docker container wait db'
+                sh 'sleep 60s'
             }
         }
 
@@ -71,7 +71,7 @@ pipeline {
         stage('Wait for the server') {
             steps {
                 echo 'Waiting for the server container'
-                sh 'docker container wait server'
+                sh 'sleep 30s'
             }
         }
 
