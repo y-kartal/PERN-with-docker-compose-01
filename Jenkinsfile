@@ -6,7 +6,6 @@ pipeline {
         APP_REPO_NAME = "todo-app"      
         DB_VOLUME="myvolume123"
         NETWORK="my_network"   
-        POSTGRES_PASSWORD= "Pp123456789" 
         DOCKER_IMAGE="yasinkartal/todo-app"   
     }
 
@@ -23,7 +22,8 @@ pipeline {
     stage('Push Image Docker Hub') {
             steps {
                 echo 'Push Image Docker Hub'
-                sh 'docker login -u yasinkartal -p dckr_pat_QCOcHihdVP0NylqtKQ_5pAkGqLM'
+                withCredentials([string(credentialsId: 'DOCKER_HUB', variable: 'DOCKER_HUB')])
+                sh 'docker login -u yasinkartal -p $DOCKER_HUB'
                 sh 'docker push "$DOCKERHUB_USER/$APP_REPO_NAME:postgre"'
                 sh 'docker push "$DOCKERHUB_USER/$APP_REPO_NAME:nodejs"'
                 sh 'docker push "$DOCKERHUB_USER/$APP_REPO_NAME:react"'
@@ -43,8 +43,9 @@ pipeline {
         }
         stage('Deploy the postgre') {
             steps {
+                withCredentials([string(credentialsId: 'POSTGRES_PASSWORD', variable: 'POSTGRES_PASSWORD')])
                 echo 'Deploy the postgre database'
-                sh 'docker run --name db -p 5432:5432 -v $DB_VOLUME:/var/lib/postgresql/data --network $NETWORK -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD --restart always -d $DOCKERHUB_USER/$APP_REPO_NAME:postgre' 
+                sh 'docker run --name db -p 5432:5432 -v $DB_VOLUME:/var/lib/postgresql/data --network $NETWORK -e POSTGRES_PASSWORD=POSTGRES_PASSWORD --restart always -d $DOCKERHUB_USER/$APP_REPO_NAME:postgre' 
             }
         }
         stage('wait the postgre database') {
@@ -96,11 +97,11 @@ pipeline {
         }
     }
 
-    post {
-        success {
-            script {
-                slackSend channel: '#class-chat', color: '#439FE0', message: ' :100: :100:  ', teamDomain: 'devops15tr', tokenCredentialId: '207'
-            }
-        }
-    }
+    // post {
+    //     success {
+    //         script {
+    //             slackSend channel: '#class-chat', color: '#439FE0', message: ' :100: :100:  ', teamDomain: 'devops15tr', tokenCredentialId: '207'
+    //         }
+    //     }
+    // }
 }
