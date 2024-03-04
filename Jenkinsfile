@@ -9,6 +9,24 @@ pipeline {
     }
 
     stages {
+        stage('Install dockerize') {
+            steps {
+                script {
+                    // 'wget' komutu yardımıyla dockerize aracını indirin
+                    sh 'wget https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz'
+                    // İndirdiğiniz arşiv dosyasını açın
+                    sh 'tar -xzvf dockerize-linux-amd64-v0.6.1.tar.gz'
+                    // Dockerize'ı uygun bir dizine taşıyın (örneğin /usr/local/bin)
+                    sh 'sudo mv dockerize /usr/local/bin'
+                }
+            }
+        }
+        
+        // Diğer aşamaları buraya ekleyin
+    }
+}
+
+    stages {
         stage('Build App Docker Image') {
             steps {
                 echo 'Building App Image'
