@@ -1,10 +1,10 @@
 FROM postgres
 
-ADD https://github.com/jwilder/dockerize/releases/download/v0.7.0/dockerize-alpine-linux-amd64-v0.7.0.tar.gz dockerize.tar.gz
+RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
 
-RUN tar -xzf dockerize.tar.gz
-
-RUN chmod +x dockerize
+RUN wget https://github.com/jwilder/dockerize/releases/download/v0.7.0/dockerize-alpine-linux-amd64-v0.7.0.tar.gz \
+    && tar -C /usr/local/bin -xzvf dockerize-alpine-linux-amd64-v0.7.0.tar.gz \
+    && rm dockerize-alpine-linux-amd64-v0.7.0.tar.gz
 
 COPY ./database/init.sql /docker-entrypoint-initdb.d/
 
