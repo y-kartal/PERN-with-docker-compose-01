@@ -22,7 +22,7 @@ pipeline {
     stage('Push Image Docker Hub') {
             steps {
                 echo 'Push Image Docker Hub'
-                withCredentials([string(credentialsId: 'DOCKER_HUB', variable: 'DOCKER_HUB')])
+                withCredentials([string(credentialsId: 'DOCKER_HUB', variable: 'DOCKER_HUB')]){
                 sh 'docker login -u yasinkartal -p $DOCKER_HUB'
                 sh 'docker push "$DOCKERHUB_USER/$APP_REPO_NAME:postgre"'
                 sh 'docker push "$DOCKERHUB_USER/$APP_REPO_NAME:nodejs"'
