@@ -2,10 +2,10 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_USER="yasinkartal"
-        APP_REPO_NAME="todo-app"
-        DB_VOLUME="myvolume"
-        NETWORK="mynetwork"
+        DOCKERHUB_USER = "yasinkartal"
+        APP_REPO_NAME = "todo-app"
+        DB_VOLUME = "myvolume"
+        NETWORK = "mynetwork"
     }
 
     stages {
@@ -23,14 +23,14 @@ pipeline {
             steps {
                 echo 'Pushing App Image to DockerHub Repo'
                 withCredentials([string(credentialsId: 'My_Docker_Hub_Token', variable: 'DOCKER_HUB')]) {
-                    sh 'docker login -u yasinkartal $DOCKERHUB_TOKEN'
+                    sh "docker login -u $DOCKERHUB_USER -p $DOCKER_HUB"
                     sh 'docker push "$DOCKERHUB_USER/$APP_REPO_NAME:postgre"'
                     sh 'docker push "$DOCKERHUB_USER/$APP_REPO_NAME:nodejs"'
                     sh 'docker push "$DOCKERHUB_USER/$APP_REPO_NAME:react"'
                 }
             }
         }
-        
+
         stage('Create Volume') {
             steps {
                 echo 'Creating the volume for app and db containers.'
