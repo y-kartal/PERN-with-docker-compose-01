@@ -29,6 +29,7 @@ pipeline {
                 sh 'docker push "$DOCKERHUB_USER/$APP_REPO_NAME:react"'
             }
         }
+    }
         stage('create volume') {
             steps {
                 echo 'create the volume for app and container'
