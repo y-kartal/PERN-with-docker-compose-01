@@ -57,7 +57,6 @@ pipeline {
         stage('Wait for the DB') {
             steps {
                 echo 'Waiting for the DB container'
-                sh './dockerize -wait tcp://db:5432 -timeout 60s'
             }
         }
 
@@ -71,7 +70,6 @@ pipeline {
         stage('Wait for the server') {
             steps {
                 echo 'Waiting for the server container'
-                sh './dockerize -wait tcp://server:5000-timeout 600s'
             }
         }
 
