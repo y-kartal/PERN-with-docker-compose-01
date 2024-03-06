@@ -58,7 +58,7 @@ pipeline {
             steps {
                 script {
                     echo 'Waiting for the DB'
-                    sh 'sleep  60s' // wait for  1 minute
+                    sh 'sleep  30s' // wait for  30 minute
                 }
             }
         }
@@ -74,7 +74,7 @@ pipeline {
             steps {
                 script {
                     echo 'Waiting for the Nodejs'
-                    sh 'sleep  30s' // wait for  30 seconds
+                    sh 'sleep  15s' // wait for  15 seconds
                 }
             }
         }
@@ -111,13 +111,15 @@ pipeline {
         }
 
         success {
-            echo 'Pipeline executed successfully'
-            sh 'echo  "SUCCESS" '
-        }
-
+            script {
+            slackSend channel: '#class-chat', color: '#439FE0', message: 'congratulations', teamDomain: 'devops15tr', tokenCredentialId: '207'
+            }
+    }
+             
         failure {
             echo 'Pipeline failed. Cleaning up containers, images, network, and volume.'
             sh 'echo  "FAILURE" '
         }
     }
 }
+
