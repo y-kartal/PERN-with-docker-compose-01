@@ -54,9 +54,12 @@ pipeline {
             }
         }
 
-        stage('Wait for the DB') {
+        stage('wait the DB-container') {
             steps {
-                echo 'Waiting for the DB container'
+                script {
+                    echo 'Waiting for the DB'
+                    sh 'sleep  60s' // wait for  1 minute
+                }
             }
         }
 
@@ -67,9 +70,12 @@ pipeline {
             }
         }
 
-        stage('Wait for the server') {
+        stage('wait the Nodejs-container') {
             steps {
-                echo 'Waiting for the server container'
+                script {
+                    echo 'Waiting for the Nodejs'
+                    sh 'sleep  30s' // wait for  30 seconds
+                }
             }
         }
 
@@ -80,19 +86,17 @@ pipeline {
             }
         }
 
-        stage('Destroy the infrastructure') {
+          stage('Approve for destroy the infrastructure') {
             steps {
                 timeout(time:5, unit:'DAYS') {
                     input message:'Approve terminate'
                 }
                 echo 'All the resources will be cleaned up in the next step...'
                 script {
-                    sh 'docker container ls && docker images && docker network ls && docker volume ls'
-                } 
+                sh 'docker container ls && docker images && docker network ls && docker volume ls'
+               } 
             }
         }
-    }
-
     post {
         always {
             echo 'Cleaning up'
@@ -114,4 +118,14 @@ pipeline {
              sh 'echo  "FAILURE" '
         }
     }
+
+
+    // post {
+    //     success {
+    //     script {
+    //     slackSend channel: '#class-chat', color: '#439FE0', message: ':fire: :fire:', teamDomain: 'devops15tr', tokenCredentialId: 'jenkins-slack'
+    //         }
+    // }
+    // }  
+
 }
