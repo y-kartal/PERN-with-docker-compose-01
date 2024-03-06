@@ -86,17 +86,19 @@ pipeline {
             }
         }
 
-          stage('Approve for destroy the infrastructure') {
+        stage('Approve for destroy the infrastructure') {
             steps {
                 timeout(time:5, unit:'DAYS') {
                     input message:'Approve terminate'
                 }
                 echo 'All the resources will be cleaned up in the next step...'
                 script {
-                sh 'docker container ls && docker images && docker network ls && docker volume ls'
-               } 
+                    sh 'docker container ls && docker images && docker network ls && docker volume ls'
+                } 
             }
         }
+    }
+
     post {
         always {
             echo 'Cleaning up'
@@ -115,17 +117,7 @@ pipeline {
 
         failure {
             echo 'Pipeline failed. Cleaning up containers, images, network, and volume.'
-             sh 'echo  "FAILURE" '
+            sh 'echo  "FAILURE" '
         }
     }
-
-
-    // post {
-    //     success {
-    //     script {
-    //     slackSend channel: '#class-chat', color: '#439FE0', message: ':fire: :fire:', teamDomain: 'devops15tr', tokenCredentialId: 'jenkins-slack'
-    //         }
-    // }
-    // }  
-
 }
